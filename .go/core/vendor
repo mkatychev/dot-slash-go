@@ -4,7 +4,7 @@ set -eof pipefail
 
 ROOT_DIR="${ROOT_DIR:-.}"
 VENDOR_FILE=${VENDOR_FILE:-"$ROOT_DIR/.go/.git-vendor"}
-VENDOR_DIR=${VENDOR_DIR:-".go/.vendor"}
+VENDOR_DIR=${VENDOR_DIR:-".go/.vendor/git"}
 PATH=$PATH:$(git --exec-path)
 # overrides location of ./go vendor add
 ADD_PATH="${ADD_PATH:-}"
@@ -278,7 +278,7 @@ remove() {
 
 # for first time dot-slash-go-setup
 init() {
-  local vendor="${INIT_DIR:-.vendor/github.com/Bestowinc/dot-slash-go}"
+  local vendor="${INIT_DIR:-$VENDOR_DIR/github.com/Bestowinc/dot-slash-go}"
   add dot-slash-go https://github.com/Bestowinc/dot-slash-go
   ln -s "$vendor/.go/core" .go/core 
   ln -s "$vendor/.go/core.usage" .go/core.usage
