@@ -1,4 +1,4 @@
-# dot-slash-go [![Build Status](https://travis-ci.org/Bestowinc/dot-slash-go.svg?branch=master)](https://travis-ci.org/Bestowinc/dot-slash-go)
+# dot-slash-go
 
 An extensible, friendly framework for project [go scripts](https://www.thoughtworks.com/insights/blog/praise-go-script-part-i).
 
@@ -16,7 +16,7 @@ An extensible, friendly framework for project [go scripts](https://www.thoughtwo
 In your project root:
 
 ```sh
-bash -c "$(curl -sS https://raw.githubusercontent.com/Bestowinc/dot-slash-go/master/install)"
+curl -fsSL "https://raw.githubusercontent.com/Bestowinc/dot-slash-go/HEAD/.go/core/vendor" | bash -s -- init
 ```
 
 ## Adding Commands
@@ -27,9 +27,6 @@ to create a tree-based command structure.
 For example, the script `.go/test/hello` would be available through `./go test hello`. Any arguments
 passed after the command will be curried through to the script, making it trivial to pass values and
 options around as needed.
-
-The simplest way to add a command however, is to just run `./go command create [command name]`
-and have it plop down the files for you to customize.
 
 ### Contextual Help
 The dot-slash-go script provides tools which enable your users to easily discover how to use your 
