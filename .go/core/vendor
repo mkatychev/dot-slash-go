@@ -284,7 +284,7 @@ init() {
   ln -s "$vendor/.go/core.usage" .go/core.usage
   ln -s ".go/$vendor/go" ./go
   git add go .go
-  git commit --amend --no-edit
+  git commit -m "added dot-slash-go-symlinks"
 }
 
 # Run the command
