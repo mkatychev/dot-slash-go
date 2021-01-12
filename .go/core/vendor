@@ -240,7 +240,7 @@ remove() {
   local rm_path
   # shellcheck disable=SC2094
   while read -r key val; do {
-    ((line++))
+    line="$((line+1))"
     local start_line
     local end_line
     local path

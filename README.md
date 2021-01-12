@@ -2,7 +2,7 @@
 
 An extensible, friendly framework for project [go scripts](https://www.thoughtworks.com/insights/blog/praise-go-script-part-i).
 
-![dot-slash-go Example](https://github.com/Bestowinc/dot-slash-go/raw/master/example.png)
+![dot-slash-go Example](https://user-images.githubusercontent.com/11223234/104383755-3cadad80-5528-11eb-9c81-529dc70c36c7.png)
 
 ## Features
 
