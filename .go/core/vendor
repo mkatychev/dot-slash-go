@@ -12,7 +12,7 @@ ADD_PATH="${ADD_PATH:-}"
 ADD="./go core vendor add [--prefix <path>] <name> <repository> [<ref>]"
 LIST="./go core vendor list [<name>]"
 REMOVE="./go core vendor remove <name>"
-UPDATE="./go core vendor update <name> [<ref>]"
+UPDATE="./go core vendor update <name> [<ref>] [--force]"
 _usage() {
   cat <<EOF
 Usage:
@@ -36,7 +36,7 @@ require_work_tree # git-sh-setup
 command="$1"
 shift
 case "$command" in
-add | list | remove | update| init) ;;
+add | list | remove | update | init) ;;
 *) echo >&2 "error: unknown command \"$command\"" && _usage && exit 1 ;;
 esac
 
@@ -56,7 +56,6 @@ get_commit() {
   local ref="$2"
   git ls-remote "$repo" "$ref" | awk '{print $1}'
 }
-
 
 add() {
   require_clean_work_tree
@@ -152,9 +151,16 @@ update() {
   if [ $# -lt 1 ]; then
     die "Incorrect options provided: $UPDATE"
   fi
-
   local name="$1"
-  local update_ref="$2"
+  local update_ref
+  local force
+  if [[ $2 == "--force" ]]; then
+    force="$2"
+  else
+    update_ref="$2"
+    force="$3"
+  fi
+
 
   local line=0
   local found
@@ -162,13 +168,14 @@ update() {
   local message
   # shellcheck disable=SC2094
   while read -r key val; do {
-    line="$((line+1))"
+    line="$((line + 1))"
     local commit
     local commit_line
     local path
-    local ref_line
     local ref
+    local ref_line
     local repo
+    local update_commit
     case "$key" in
     "{") unset commit commit_line path ref_line ref repo ;;
     name:) {
@@ -181,7 +188,10 @@ update() {
       ref="$val"
     } ;;
     repo:) repo="$val" ;;
-    commit:) commit_line="$line" ;;
+    commit:)
+      commit="$val"
+      commit_line="$line"
+      ;;
     path:) path="$val" ;;
     "}")
       {
@@ -199,7 +209,11 @@ update() {
         if [ -z "$update_ref" ]; then # if no ref was provided use one present in vendor file
           update_ref="$ref"
         fi
-        commit="$(get_commit "$repo" "$update_ref")"
+        update_commit="$(get_commit "$repo" "$update_ref")"
+        if [[ "$update_commit" == "$commit" && "$force" != "--force" ]]; then
+          echo "remote $name/$ref commit match, skipping update attempt..."
+          break
+        fi
         message=$(
           cat <<EOF
 Update $name from $repo@$update_ref
@@ -208,11 +222,11 @@ git-vendor-name: $name
 git-vendor-path: $path
 git-vendor-repository: $repo
 git-vendor-ref: $update_ref
-git-vendor-commit: $commit
+git-vendor-commit: $update_commit
 EOF
         )
         # replace ref if it has changed
-        update_file=$(sed "${ref_line}s/^.*$/	ref: $update_ref/" "$VENDOR_FILE" | sed "${commit_line}s/^.*$/	commit: $commit/")
+        update_file=$(sed "${ref_line}s/^.*$/	ref:	$update_ref/" "$VENDOR_FILE" | sed "${commit_line}s/^.*$/	commit:	$update_commit/")
         break
       }
       ;;
@@ -220,10 +234,17 @@ EOF
   }; done <"$VENDOR_FILE"
 
   if [ -n "$update_file" ]; then
-    git subtree pull --prefix "$path" --message "$message" "$repo" "$update_ref" --squash
-    echo "$update_file" >"$VENDOR_FILE"
-    git add "$VENDOR_FILE"
-    git commit --amend --no-edit # amend commit now
+    local pre_update_commit
+    pre_update_commit="$(git log -1 --format=%H)"
+
+    echo "$update_file" >"$VENDOR_FILE" && \
+    rm -rf "$path" && \
+    git add "$VENDOR_FILE" "$path" && \
+    git commit --message "$message" --quiet && \
+    git subtree add --prefix "$path" "$repo" "$update_ref" && \
+    git reset --soft HEAD^^ --quiet && \
+    git commit --message "$message" || \
+    git reset --hard "$pre_update_commit"
   fi
 }
 
@@ -240,7 +261,7 @@ remove() {
   local rm_path
   # shellcheck disable=SC2094
   while read -r key val; do {
-    line="$((line+1))"
+    line="$((line + 1))"
     local start_line
     local end_line
     local path
@@ -280,7 +301,7 @@ remove() {
 init() {
   local vendor="${INIT_DIR:-.vendor/git/github.com/Bestowinc/dot-slash-go}"
   add dot-slash-go https://github.com/Bestowinc/dot-slash-go
-  ln -s "$vendor/.go/core" .go/core 
+  ln -s "$vendor/.go/core" .go/core
   ln -s "$vendor/.go/core.usage" .go/core.usage
   ln -s ".go/$vendor/go" ./go
   git add go .go
