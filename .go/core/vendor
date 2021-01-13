@@ -95,7 +95,7 @@ git-vendor-ref: $ref
 git-vendor-commit: $commit
 EOF
   )
-  git subtree add --prefix "$path" "$repo" "$ref"
+  git subtree add --prefix "$path" "$repo" "$ref" --squash
 
   # append vendor file modification to same commit
   if [ ! -s "$VENDOR_FILE" ]; then
@@ -241,7 +241,7 @@ EOF
     rm -rf "$path" && \
     git add "$VENDOR_FILE" "$path" && \
     git commit --message "$message" --quiet && \
-    git subtree add --prefix "$path" "$repo" "$update_ref" && \
+    git subtree add --prefix "$path" "$repo" "$update_ref" --squash && \
     git reset --soft HEAD^^ --quiet && \
     git commit --message "$message" || \
     git reset --hard "$pre_update_commit"
