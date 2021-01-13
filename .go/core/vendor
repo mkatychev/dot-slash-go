@@ -96,7 +96,7 @@ git-vendor-ref: $ref
 git-vendor-commit: $commit
 EOF
   )
-  git subtree add --prefix "$path" --message "$message" "$repo" "$ref" --squash
+  git subtree add --prefix "$path" "$repo" "$ref"
 
   # append vendor file modification to same commit
   if [ ! -s "$VENDOR_FILE" ]; then
@@ -112,7 +112,7 @@ EOF
 }
 EOF
   git add "$VENDOR_FILE"
-  git commit --amend --no-edit # amend commit now
+  git commit --amend --message="$message"
 }
 
 list() {
