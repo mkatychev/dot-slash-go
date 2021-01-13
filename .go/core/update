@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -eof pipefail
+
+ROOT_DIR="${ROOT_DIR:-.}"
+"$(dirname "$0")/vendor" update dot-slash-go

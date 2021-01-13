@@ -302,7 +302,6 @@ init() {
   local vendor="${INIT_DIR:-.vendor/git/github.com/Bestowinc/dot-slash-go}"
   add dot-slash-go https://github.com/Bestowinc/dot-slash-go
   ln -s "$vendor/.go/core" .go/core
-  ln -s "$vendor/.go/core.usage" .go/core.usage
   ln -s ".go/$vendor/go" ./go
   git add go .go
   git commit -m "added dot-slash-go-symlinks"
