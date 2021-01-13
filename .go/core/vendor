@@ -16,7 +16,7 @@ UPDATE="./go core vendor update <name> [<ref>] [--force]"
 _usage() {
   cat <<EOF
 Usage:
-  ./go vendor --help
+  ./go core vendor --help
   $ADD
   $LIST
   $REMOVE

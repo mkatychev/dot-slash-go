@@ -12,11 +12,7 @@ COLOR_LIGHT_GRAY="\033[37m"
 COLOR_DARK_GRAY="\033[38m"
 COLOR_NORMAL="\033[39m"
 
-ROOT_DIR="${ROOT_DIR:-.}"
-
-function bcli_resolve_path() {
-  echo "$ROOT_DIR"
-}
+ROOT_DIR="${ROOT_DIR:-$(dirname "$(pwd)/$0")}"
 
 function bcli_trim_whitespace() {
   # Function courtesy of http://stackoverflow.com/a/3352015
@@ -31,16 +27,13 @@ function bcli_show_header() {
 }
 
 function bcli_entrypoint() {
-  local root_dir
-  root_dir=$(dirname "$(bcli_resolve_path "$0")")
-
   local cli_entrypoint
   cli_entrypoint=$(basename "$0")
 
   # Locate the correct command to execute by looking through the app directory
   # for folders and files which match the arguments provided on the command line.
   local cmd_file
-  cmd_file="$root_dir/.go/"
+  cmd_file="$ROOT_DIR/.go/"
   local cmd_arg_start
   cmd_arg_start=1
   while [[ -d "$cmd_file" && $cmd_arg_start -le $# ]]; do
@@ -89,7 +82,6 @@ function bcli_entrypoint() {
   arg_i=0 # We need the index to be able to strip list indices
   for arg in "${cmd_args[@]}"; do
     if [[ "${arg}" == "--help" && -f "$cmd_file.help" ]]; then
-      # if [[ "${arg}" == "--help" ]]; then
       # Strip off the `--help` portion of the command
       unset "cmd_args[$arg_i]"
       cmd_args=("${cmd_args[@]}")
@@ -108,7 +100,7 @@ function bcli_entrypoint() {
   # If the command exited with an exit code of 3 (our "show help" code)
   # then show the help documentation for the command.
   if [[ $EXIT_CODE == 3 ]]; then
-    "$root_dir/help" "$0" "$@"
+    "$ROOT_DIR/help" "$0" "$@"
   fi
 
   # Exit with the same code as the command
@@ -116,22 +108,18 @@ function bcli_entrypoint() {
 }
 
 function bcli_help() {
-  local root_dir
-  root_dir=$(dirname "$(bcli_resolve_path "$0")")
-
   local cli_entrypoint
   cli_entrypoint=$(basename "$1")
 
-  # If we don't have any additional help arguments, then show the app's
-  # header as well.
-  if [ $# == 0 ]; then
-    bcli_show_header "$root_dir/.go"
+  # If we don't have any additional help arguments, then show the app's header as well.
+  if [ $# == 1 ]; then
+    bcli_show_header "$ROOT_DIR/.go"
   fi
 
   # Locate the correct level to display the helpfile for, either a directory
   # with no further arguments, or a command file.
   local help_file
-  help_file="$root_dir/.go/"
+  help_file="$ROOT_DIR/.go/"
   local help_arg_start
   help_arg_start=2
   while [[ -d "$help_file" && $help_arg_start -le $# ]]; do
@@ -151,7 +139,6 @@ function bcli_help() {
       echo ""
     fi
 
-    echo ""
     echo -e "${COLOR_MAGENTA}Commands${COLOR_NORMAL}"
     echo ""
 
@@ -166,7 +153,8 @@ function bcli_help() {
           bcli_trim_whitespace "$(cat "$file.usage")"
           echo ""
         elif [[ -d "$file" ]]; then
-          echo -e "${COLOR_MAGENTA}...${COLOR_NORMAL}"
+          bcli_trim_whitespace "$(cat "$file/.usage")" || echo -e "${COLOR_MAGENTA}...${COLOR_NORMAL}"
+          echo ""
         else
           echo ""
         fi
