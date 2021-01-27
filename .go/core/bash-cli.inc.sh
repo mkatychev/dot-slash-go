@@ -12,7 +12,10 @@ COLOR_LIGHT_GRAY="\033[37m"
 COLOR_DARK_GRAY="\033[38m"
 COLOR_NORMAL="\033[39m"
 
-ROOT_DIR="${ROOT_DIR:-$(dirname "$(pwd)/$0")}"
+ROOT_DIR="${ROOT_DIR:-$(
+  cd "$(dirname "$0")"
+  pwd -P
+)}"
 
 function bcli_trim_whitespace() {
   # Function courtesy of http://stackoverflow.com/a/3352015
