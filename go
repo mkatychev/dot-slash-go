@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-ROOT_DIR="${ROOT_DIR:-$(
+ROOT_DIR="$(
   cd "$(dirname "$0")"
   pwd -P
-)}"
+)"
 
 # shellcheck source=./.go/core/bash-cli.inc.sh
 source ".go/core/bash-cli.inc.sh"
