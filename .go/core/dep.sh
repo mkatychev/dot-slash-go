@@ -13,20 +13,20 @@ source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 # dep updates/installs binaries to $BIN_DIR or checks the existence of a CLI tool in $PATH
 dep() {
   # .dep manifest arguments
-  #######################################################
+  ############################################################################
   local name="$1" # name of the command line tool
   local varg      # argument to call returning vesrion number
   local v_ref     # minimum expected version
   local os_ref    # pattern used to curl the correct tar file
   local url       # envsubst pattern used to seed the download link
-  local tar_dir   # if file is not in root directory, provide location of file
-  #######################################################
+  local tar_path  # if file is not in root directory, provide location of file
+  ############################################################################
   {
     read -r varg
     read -r v_ref
     read -r os_ref
     read -r url
-    read -r tar_dir
+    read -r tar_path
     read -r found
   } <<<"$(read_manifest "$name" "$DEP_FILE")"
 
@@ -42,7 +42,7 @@ dep() {
   if [ ! -s "$BIN_DIR/$name" ]; then
     # attempt to install the tool if supported
     warn "installing ${name} v${v_ref}..."
-    get_dep "$name" "$url" "$tar_dir"
+    get_dep "$name" "$url" "$tar_path"
   fi
 
   # call/eval cli tool with version
@@ -58,7 +58,7 @@ dep() {
       warn "expected version: ${v_ref}"
       warn "$name v${eval_version} is outdated"
       warn "installing ${name} v${v_ref}..."
-      get_dep "$name" "$url" "$tar_dir"
+      get_dep "$name" "$url" "$tar_path"
     fi
   else
     fail "unable to install ${name} v${v_ref}"
@@ -75,7 +75,7 @@ read_manifest() {
   local darwin_ref
   local linux_ref
   local url
-  local tar_dir
+  local tar_path
 
   while read -r key val; do {
     case "$key" in
@@ -94,11 +94,11 @@ read_manifest() {
     darwin_ref:) darwin_ref="$val" ;;
     linux_ref:) linux_ref="$val" ;;
     url:) url="$val" ;;
-    tar_dir:) tar_dir="$val" ;;
+    tar_path:) tar_path="$val" ;;
     "}")
       {
         if [[ "$found" == 0 ]]; then
-          unset varg v_ref darwin_ref linux_ref url tar_dir
+          unset varg v_ref darwin_ref linux_ref url tar_path
           continue # keep iterating if name match not found
         fi
 
@@ -110,7 +110,7 @@ read_manifest() {
         *) fail "UNKNOWN OS: $OSTYPE" ;;
         esac
         url="$(eval echo "$url")"
-        tar_dir="$(eval echo "$tar_dir")"
+        tar_path="$(eval echo "${tar_path:-}")"
 
       }
       ;;
@@ -121,7 +121,7 @@ read_manifest() {
   echo "$v_ref"
   echo "$os_ref"
   echo "$url"
-  echo "$tar_dir"
+  echo "$tar_path"
   echo "$found"
 }
 
@@ -129,12 +129,12 @@ read_manifest() {
 get_dep() {
   local name="$1"
   local url="$2"
-  local tar_dir="${3:-$1}"
-  local dir_nesting="${tar_dir//[^\/]/}"
+  local tar_path="${3:-$1}"
+  local dir_nesting="${tar_path//[^\/]/}"
   # count the # of directories to strip by amount of forward slashes
   local strip_count=${#dir_nesting}
 
-  curl -SLk "${url}" | tar xvz --strip-components "$strip_count" -C "$BIN_DIR" "$tar_dir"
+  curl -SLk "${url}" | tar xvz --strip-components "$strip_count" -C "$BIN_DIR" "$tar_path"
 }
 
 # version invites a tool's '--version' subcommand to return a string's stdout and stderr output to look
