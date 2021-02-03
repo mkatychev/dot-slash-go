@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -euo pipefail
 
 ROOT_DIR="${ROOT_DIR:-../..}"
 DEP_FILE=${DEP_FILE:-"$ROOT_DIR/.go/.dep"}
@@ -117,12 +117,12 @@ read_manifest() {
     esac
   }; done <"$dep_file"
   # return defs
-  echo "$varg"
-  echo "$v_ref"
-  echo "$os_ref"
-  echo "$url"
-  echo "$tar_path"
-  echo "$found"
+  echo "${varg:-}"
+  echo "${v_ref:-}"
+  echo "${os_ref:-}"
+  echo "${url:-}"
+  echo "${tar_path:-}"
+  echo "${found:-}"
 }
 
 # get_det curls a tar.gz url and untars the result to $BIN_DIR
