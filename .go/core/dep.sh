@@ -51,7 +51,7 @@ dep() {
 
   # check if local version is out of date for supported tools,  warn if out of date
   if [ -n "$eval_version" ]; then
-    local latest_return
+    local latest_return=0
     is_latest "$name" "$v_ref" "$eval_version" || latest_return=$?
     if [[ "$latest_return" == 3 ]]; then
       warn "local version: ${eval_version}"
