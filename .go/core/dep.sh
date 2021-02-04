@@ -52,8 +52,6 @@ dep() {
     local latest_return=0
     is_latest "$name" "$v_ref" "$eval_version" || latest_return=$?
     if [[ "$latest_return" == 3 ]]; then
-      warn "local version: ${eval_version}"
-      warn "expected version: ${v_ref}"
       warn "$name v${eval_version} is outdated"
       warn "installing ${name} v${v_ref}..."
       get_dep "$name" "$url" "$tar_path"

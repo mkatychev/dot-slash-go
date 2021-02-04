@@ -143,7 +143,7 @@ function dsg_help() {
         if [[ -f "$file.usage" ]]; then
           dsg_trim_whitespace "$(cat "$file.usage")"
           echo ""
-        elif [[ -d "$file" && -f "$file.usage" ]]; then
+        elif [[ -d "$file" && -f "$file/.usage" ]]; then
           dsg_trim_whitespace "$(cat "$file/.usage")"
           echo ""
         elif [[ -d "$file" && ! -f "$file.usage" ]]; then
