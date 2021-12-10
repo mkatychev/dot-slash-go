@@ -29,14 +29,19 @@ case "$1" in
 esac
 
 # shellcheck disable=SC1091
-source git-sh-setup
-
+source "$(git --exec-path)/git-sh-setup"
 require_work_tree # git-sh-setup
 
 command="$1"
 shift
 case "$command" in
-add | list | remove | update | init) ;;
+add | list | remove | update | init) {
+  if [[ "$1" == +(--help|-h) ]]; then
+    usage="${command^^}" # update -> UPDATE
+    echo "${!usage}"     # echo $UPDATE
+    exit 0
+  fi
+} ;;
 *) echo >&2 "error: unknown command \"$command\"" && _usage && exit 1 ;;
 esac
 

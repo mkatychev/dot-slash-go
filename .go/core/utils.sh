@@ -35,7 +35,7 @@ function warn {
 }
 
 function error {
-  echo -e "${COLOR_ERROR}ERROR:$*${COLOR_NORMAL}" 1>&2
+  echo -e "${COLOR_ERROR}error${COLOR_NORMAL}: $*" 1>&2
 }
 
 function fail {

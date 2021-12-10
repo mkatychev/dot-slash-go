@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+set -eof pipefail
+
+ROOT_DIR="${ROOT_DIR:-$(git rev-parse --show-toplevel)}"
+DEP_FILE=${DEP_FILE:-"$ROOT_DIR/.go/.dep"}
+BIN_DIR=${BIN_DIR:-"$ROOT_DIR/.go/.bin"}
+PATH=$BIN_DIR:$PATH
+
+
+# shellcheck source=.go/core/utils.sh
+source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
+
+DEP_HEADER="#############################################################################
+# name     - name of the command line tool
+# varg     - argument to call returning vesrion number
+# v_ref    - minimum expected version
+# os_ref   - will substitute for 'darwin_ref' or 'linux_ref' depending on
+#            $OSTYPE
+# url      - envsubst pattern used to seed the download link
+# tar_path - if file is not in root directory, provide location of file
+##############################################################################"
+
+INIT="./go core dep init"
+_usage() {
+  cat <<EOF
+Usage:
+  ./go core vendor --help
+  $INIT
+EOF
+}
+
+case "$1" in
+"" | -h | --help) _usage && exit ;;
+esac
+command="$1"
+shift
+
+
+init() {
+  if [ -s "$DEP_FILE" ]; then
+    error ".dep file already exists:\n\t$DEP_FILE"
+    exit 2
+  fi
+
+  echo "$DEP_HEADER" >"$DEP_FILE"
+
+}
+
+"$command" "$@"
