@@ -308,7 +308,7 @@ remove() {
 
 # for first time dot-slash-go-setup
 init() {
-  local repo = "$1"
+  local repo="$1"
   local vendor=".vendor/git/$repo"
   add dot-slash-go "https://$repo" # assume https is supported
   ln -s "$vendor/.go/core" .go/core
