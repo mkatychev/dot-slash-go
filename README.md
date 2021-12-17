@@ -16,7 +16,7 @@ An extensible, friendly framework for project [go scripts](https://www.thoughtwo
 In your project root:
 
 ```sh
-curl -fsSL "https://raw.githubusercontent.com/Bestowinc/dot-slash-go/HEAD/.go/core/vendor" | bash -s -- init
+curl -fsSL "https://raw.githubusercontent.com/mkatychev/dot-slash-go/HEAD/.go/core/vendor" | bash -s -- init
 ```
 
 ## Adding Commands

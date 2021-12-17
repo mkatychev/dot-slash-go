@@ -229,7 +229,7 @@ git-vendor-commit: $update_commit
 EOF
         )
         # replace ref if it has changed
-        update_file=$(sed "${ref_line}s/^.*$/	ref:	$update_ref/" "$VENDOR_FILE" | sed "${commit_line}s/^.*$/	commit:	$update_commit/")
+        update_file=$(sed "${ref_line}s~^.*$~	ref:	$update_ref~" "$VENDOR_FILE" | sed "${commit_line}s~^.*$~	commit:	$update_commit~")
         break
       }
       ;;
